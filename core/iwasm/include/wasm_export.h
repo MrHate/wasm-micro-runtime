@@ -1610,6 +1610,24 @@ wasm_runtime_begin_blocking_op(wasm_exec_env_t exec_env);
 WASM_RUNTIME_API_EXTERN void
 wasm_runtime_end_blocking_op(wasm_exec_env_t exec_env);
 
+/*
+ * Unsafe memory mapping between host and Wasm instance.
+ *
+ * Note: the current impl supports no more than one remapping instance
+ * established. A subsequent remapping establishment deactivates its
+ * previous one.
+ *
+ * @param addr the memory address in host context
+ * @param app_buf a buffer allocated with wasm_runtime_module_malloc
+ * @param module_inst the module instance app_buf belongs to
+ * @param size the size of mapping region
+ *
+ * @return true if success, false otherwise
+ */
+WASM_RUNTIME_API_EXTERN bool
+wasm_runtime_mremap(void *addr, uint32_t app_buf,
+                    wasm_module_inst_t module_inst, uint32_t size);
+
 /* clang-format on */
 
 #ifdef __cplusplus

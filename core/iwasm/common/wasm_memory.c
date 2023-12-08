@@ -42,6 +42,15 @@ static void (*free_func)(void *ptr) = NULL;
 
 static unsigned int global_pool_size;
 
+static struct {
+  void *addr_host;
+  void *addr_app;
+  void *addr_app_end;
+  uint32_t size;
+} mremap_descriptor = {
+  NULL, NULL, NULL, 0
+};
+
 static bool
 wasm_memory_init_with_pool(void *mem, unsigned int bytes)
 {
@@ -898,4 +907,29 @@ wasm_enlarge_memory(WASMModuleInstance *module, uint32 inc_page_count)
 #endif
 
     return ret;
+}
+
+bool
+wasm_runtime_mremap(void *addr, uint32_t app_buf,
+                    wasm_module_inst_t module_inst, uint32_t size)
+{
+  mremap_descriptor.size = size;
+  mremap_descriptor.addr_host = addr;
+  mremap_descriptor.addr_app =
+      wasm_runtime_addr_app_to_native(module_inst, app_buf);
+  mremap_descriptor.addr_app_end =
+      mremap_descriptor.addr_app + size;
+
+  return mremap_descriptor.addr_app != NULL;
+}
+
+void *
+wasm_runtime_mremap_pass(void *addr)
+{
+  if (mremap_descriptor.size == 0)
+      return addr;
+  if (addr >= mremap_descriptor.addr_app && addr < mremap_descriptor.addr_app_end)
+      return addr - mremap_descriptor.addr_app + mremap_descriptor.addr_host;
+
+  return addr;
 }

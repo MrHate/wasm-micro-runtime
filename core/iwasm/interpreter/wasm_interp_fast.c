@@ -40,6 +40,7 @@ typedef float64 CellType_F64;
             /* If offset1 is in valid range, maddr must also     \
                 be in valid range, no need to check it again. */ \
             maddr = memory->memory_data + offset1;               \
+            maddr = wasm_runtime_mremap_pass(maddr);             \
         else                                                     \
             goto out_of_bounds;                                  \
     } while (0)
@@ -51,6 +52,7 @@ typedef float64 CellType_F64;
             /* App heap space is not valid space for                           \
                bulk memory operation */                                        \
             maddr = memory->memory_data + offset1;                             \
+            maddr = wasm_runtime_mremap_pass(maddr);                           \
         else                                                                   \
             goto out_of_bounds;                                                \
     } while (0)
@@ -59,11 +61,13 @@ typedef float64 CellType_F64;
     do {                                                \
         uint64 offset1 = (uint64)offset + (uint64)addr; \
         maddr = memory->memory_data + offset1;          \
+        maddr = wasm_runtime_mremap_pass(maddr);        \
     } while (0)
 
 #define CHECK_BULK_MEMORY_OVERFLOW(start, bytes, maddr) \
     do {                                                \
         maddr = memory->memory_data + (uint32)(start);  \
+        maddr = wasm_runtime_mremap_pass(maddr);        \
     } while (0)
 #endif /* !defined(OS_ENABLE_HW_BOUND_CHECK) \
           || WASM_CPU_SUPPORTS_UNALIGNED_ADDR_ACCESS == 0 */

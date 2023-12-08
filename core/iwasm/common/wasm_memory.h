@@ -42,6 +42,9 @@ void
 wasm_runtime_set_enlarge_mem_error_callback(
     const enlarge_memory_error_callback_t callback, void *user_data);
 
+void*
+wasm_runtime_mremap_pass(void *addr);
+
 #ifdef __cplusplus
 }
 #endif
